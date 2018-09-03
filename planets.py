@@ -8,6 +8,17 @@
 # virtualenv --no-site-packages --distribute .env && source .env/bin/activate && pip install -r requirements.txt
 
 
+# Planet-Positions on 01.07,18  (seehttp://www.engadiner-astrofreunde.ch/planetenstellung_aktuell.html)
+# mercury 201°
+# venus   206°
+# earth   280°
+# mars    290°
+# jupiter 230°
+# saturn  276°
+# uranus   27°
+# neptun  346°
+
+
 import sys, math, pygame
 pygame.init()
 
@@ -44,15 +55,23 @@ class Planet:
     def __init__(self, name, size, angle, distance, color, orbital_period):
         self.name = name
         self.size = size  # Äquatordurchmesser [km]
-        self.angle = angle
+        self.start_angle = angle + 180
+        self.angle = angle + 180
         self.distance = distance  # Perihel [AE]
         self.color = color
         self.orbital_period = orbital_period  # Siderische Umlaufzeit [days]
         self.text = font_planet_name.render(self.name, True, self.color)
 
-    def draw(self, days):
+    def setDays(self, days):
         planet_day = days % self.orbital_period
-        self.angle = 360 * planet_day / self.orbital_period
+        angle_per_day = 360 / self.orbital_period
+        #self.angle = 360 * planet_day / self.orbital_period
+        self.angle = (self.start_angle + angle_per_day * days) % 360
+
+    def draw(self, days):
+        self.setDays(days)
+        # planet_day = days % self.orbital_period
+        # self.angle = 360 * planet_day / self.orbital_period
         # print("angle = %f days = %i orbital_period = %i math.cos(self.angle) = %f" % (self.angle, days, self.orbital_period, math.cos(self.angle*math.pi/180.0)))
 
         x = int(sun[0]) + math.cos(self.angle*math.pi/180.0) * self.distance*100
@@ -69,11 +88,11 @@ class Planet:
             screen.blit(self.text, (x + self.size//2 + 20 + self.text.get_width() // 2, y - self.text.get_height() // 2))
 
 
-mercury = Planet("Mercury", size=4.879, angle=16, distance=0.307498, color=lightyellow, orbital_period=87.969)
-venus = Planet("Venus", size=12.103, angle=246, distance=0.718, color=lightblue, orbital_period=224.701)
-earth = Planet("Earth", size=12.756, angle=36, distance=0.983, color=blue, orbital_period=365.256363004)
-mars = Planet("Mars", size=6.792, angle=110, distance=1.381, color=red, orbital_period=686.980)
-jupiter = Planet("Jupiter", size=142.984, angle=190, distance=4.95, color=(188, 143, 143), orbital_period=4330)
+mercury = Planet("Mercury", size=4.879,   angle=201, distance=0.307498, color=lightyellow, orbital_period=87.969)
+venus   = Planet("Venus",   size=12.103,  angle=206, distance=0.718, color=lightblue, orbital_period=224.701)
+earth   = Planet("Earth",   size=12.756,  angle=280, distance=0.983, color=blue, orbital_period=365.256363004)
+mars    = Planet("Mars",    size=6.792,   angle=290, distance=1.381, color=red, orbital_period=686.980)
+jupiter = Planet("Jupiter", size=142.984, angle=230, distance=4.95, color=(188, 143, 143), orbital_period=4330)
 
 
 def drawSun():
